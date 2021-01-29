@@ -75,9 +75,9 @@ Use an ```ifelse``` statement to add a new column **‘male.teen’** to the dat
 
 #### Exercise 7:
 Download and safe the files: 
-- [BestActorAward.csv](Data/BestActorAward.csv)
-- [BestDirectorAward.csv](Data/BestDirectorAward.csv)
-- [Films.csv](Data/Films.csv)
+- [BestActorAward.csv](https://github.com/mvochteloo/Teaching-modules/blob/gh-pages/Data/BestActorAward.csv)
+- [BestDirectorAward.csv](https://github.com/mvochteloo/Teaching-modules/blob/gh-pages/Data/BestDirectorAward.csv)
+- [Films.csv](https://github.com/mvochteloo/Teaching-modules/blob/gh-pages/Data/Films.csv)
 
 Set the working directory to the folder where you stored the files:
 ```R
@@ -112,7 +112,7 @@ ___
 #### Part 4: basic statistics
 #### Exercise 9:
 
-The file ['ebola.csv'](Data/ebola.csv) contains the total cases of ebola from the start of the outbreak in March 2014 until January 4th 2015. It also contains the logtransformed number of cases.
+The file ['ebola.csv'](https://github.com/mvochteloo/Teaching-modules/blob/gh-pages/Data/ebola.csv) contains the total cases of ebola from the start of the outbreak in March 2014 until January 4th 2015. It also contains the logtransformed number of cases.
 - a. Read the data in. Plot the number of cases against the day and look at the graph. It shows a typical growth curve. Now plot the LogCases against the day. It shows the same data, but after a transformation. Is the correlation strong or weak?
 - b. Perform linear regression on the transformed data and add the regression line to the plot. Write the regression model as comment:
 ```R
