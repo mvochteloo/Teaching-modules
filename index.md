@@ -9,10 +9,9 @@
 - Exercises 1 to 7 are based on on homework from Dr. C. Pelletier and Dr. L. Maruster - Learning Community R 2020 and licensed under the [Creative Commons Attribution-NonCommercial 3.0 Unported License](https://creativecommons.org/licenses/by-nc/3.0/). 
 - Exercise 9 is based on a Bio-informtics exam at the Hanze Unversity course 'statistics 4' in 2015 made by Tsjerk Wassenaar.
 
-### Exercises:
-
 ___
 
+### Exercises:
 #### Part 1: introduction to syntax
 ##### Exercise 1:
 In 2019 [Rami Malek](https://en.wikipedia.org/wiki/Rami_Malek) won the 91st best actor award at the Oscar ceremony. Information has been gathered over him and is listed below:
