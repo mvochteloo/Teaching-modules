@@ -19,10 +19,10 @@ In 2019 [Rami Malek](https://en.wikipedia.org/wiki/Rami_Malek) won the 91st best
 > Best Actor: RamiMaleK (Bohemian Rhapsody). The actor is American, born the 12th of May 1981 in LA (US), from Middle East ethnicity, Christian faith.
 - a. Generate a named list **oscarWinnerBestActorProfile** in which you store the information collected on Rami MaleK. Use meaningful names!
 
-The movie he played in "Bohemian Rapsody", is a Biography, has a imdb rating: 8.2, and is rated on Rotten tomatoes by expert with 0.61, and by the public with 8.8.
+The movie he played in "Bohemian Rapsody", is a Biography, has a imdb rating: ```8.2```, and is rated on Rotten tomatoes by expert with ```0.61```, and by the public with ```8.8```.
 - b. Add this new following information to the list
 - c. Remove the information about his faith
-- d. Adjust the public rating on Rotten Tomatoes to 0.88 
+- d. Adjust the public rating on Rotten Tomatoes to ```0.88```
 
 #### Exercise 2:
 Create the following vector: ```vector1 <- c(2, 10, 4, 8, 6, 12)```
