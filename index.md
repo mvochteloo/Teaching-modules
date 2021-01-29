@@ -12,7 +12,7 @@
 ___
 
 ### Exercises:
-#### Part 1: introduction to syntax
+#### Part 1: R syntax and basic operations
 ##### Exercise 1:
 In 2019 [Rami Malek](https://en.wikipedia.org/wiki/Rami_Malek) won the 91st best actor award at the Oscar ceremony. Information has been gathered over him and is listed below:
 
