@@ -16,7 +16,7 @@ ___
 ##### Exercise 1:
 In 2019 [Rami Malek](https://en.wikipedia.org/wiki/Rami_Malek) won the 91st best actor award at the Oscar ceremony. Information has been gathered over him and is listed below:
 
-Best Actor: RamiMaleK (Bohemian Rhapsody). The actor is American, born the 12th of May 1981 in LA (US), from Middle East ethnicity, Christian faith.
+> Best Actor: RamiMaleK (Bohemian Rhapsody). The actor is American, born the 12th of May 1981 in LA (US), from Middle East ethnicity, Christian faith.
 - a. Generate a named list **oscarWinnerBestActorProfile** in which you store the information collected on Rami MaleK. Use meaningful names!
 
 The movie he played in "Bohemian Rapsody", is a Biography, has a imdb rating: 8.2, and is rated on Rotten tomatoes by expert with 0.61, and by the public with 8.8.
