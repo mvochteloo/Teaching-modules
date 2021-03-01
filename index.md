@@ -4,23 +4,26 @@
 - [R](http://cran.r-project.org/) 
 - [RStudio](http://www.rstudio.com/products/rstudio/download/)
 
-### Exercises:
+### References:
 
-The exercises 1 to 7 are based on on homework from Dr. C. Pelletier and Dr. L. Maruster - Learning Community R 2020 and licensed under the [Creative Commons Attribution-NonCommercial 3.0 Unported License](https://creativecommons.org/licenses/by-nc/3.0/). Exercise 9 is based on a Bio-informtics exam at the Hanze Unversity course 'statistics 4' in 2015 made by Tsjerk Wassenaar.
+- Exercises 1 to 7 are based on on homework from Dr. C. Pelletier and Dr. L. Maruster - Learning Community R 2020 and licensed under the [Creative Commons Attribution-NonCommercial 3.0 Unported License](https://creativecommons.org/licenses/by-nc/3.0/). 
+- Exercise 9 is based on a Bio-informtics exam at the Hanze Unversity course 'statistics 4' in 2015 made by Tsjerk Wassenaar.
 
 ___
 
-#### Part 1: introduction to syntax
+### Exercises:
+#### Part 1: R syntax and basic operations
 ##### Exercise 1:
 In 2019 [Rami Malek](https://en.wikipedia.org/wiki/Rami_Malek) won the 91st best actor award at the Oscar ceremony. Information has been gathered over him and is listed below:
 
-Best Actor: RamiMaleK (Bohemian Rhapsody). The actor is American, born the 12th of May 1981 in LA (US), from Middle East ethnicity, Christian faith.
+> Best Actor: RamiMaleK (Bohemian Rhapsody). The actor is American, born the 12th of May 1981 in LA (US), from Middle East ethnicity, Christian faith.
+
 - a. Generate a named list **oscarWinnerBestActorProfile** in which you store the information collected on Rami MaleK. Use meaningful names!
 
-The movie he played in "Bohemian Rapsody", is a Biography, has a imdb rating: 8.2, and is rated on Rotten tomatoes by expert with 0.61, and by the public with 8.8.
+The movie he played in "Bohemian Rapsody", is a Biography, has a imdb rating: ```8.2```, and is rated on Rotten tomatoes by expert with ```0.61```, and by the public with ```8.8```.
 - b. Add this new following information to the list
 - c. Remove the information about his faith
-- d. Adjust the public rating on Rotten Tomatoes to 0.88 
+- d. Adjust the public rating on Rotten Tomatoes to ```0.88```
 
 #### Exercise 2:
 Create the following vector: ```vector1 <- c(2, 10, 4, 8, 6, 12)```
@@ -75,9 +78,9 @@ Use an ```ifelse``` statement to add a new column **‘male.teen’** to the dat
 
 #### Exercise 7:
 Download and safe the files: 
-- [BestActorAward.csv](Data/BestActorAward.csv)
-- [BestDirectorAward.csv](Data/BestDirectorAward.csv)
-- [Films.csv](Data/Films.csv)
+- [BestActorAward.csv](https://github.com/mvochteloo/Teaching-modules/blob/gh-pages/Data/BestActorAward.csv)
+- [BestDirectorAward.csv](https://github.com/mvochteloo/Teaching-modules/blob/gh-pages/Data/BestDirectorAward.csv)
+- [Films.csv](https://github.com/mvochteloo/Teaching-modules/blob/gh-pages/Data/Films.csv)
 
 Set the working directory to the folder where you stored the files:
 ```R
@@ -112,7 +115,7 @@ ___
 #### Part 4: basic statistics
 #### Exercise 9:
 
-The file ['ebola.csv'](Data/ebola.csv) contains the total cases of ebola from the start of the outbreak in March 2014 until January 4th 2015. It also contains the logtransformed number of cases.
+The file ['ebola.csv'](https://github.com/mvochteloo/Teaching-modules/blob/gh-pages/Data/ebola.csv) contains the total cases of ebola from the start of the outbreak in March 2014 until January 4th 2015. It also contains the logtransformed number of cases.
 - a. Read the data in. Plot the number of cases against the day and look at the graph. It shows a typical growth curve. Now plot the LogCases against the day. It shows the same data, but after a transformation. Is the correlation strong or weak?
 - b. Perform linear regression on the transformed data and add the regression line to the plot. Write the regression model as comment:
 ```R
