@@ -1,4 +1,4 @@
 ## Overview
 
 ### Practicals:
-- R
+- [R](Practicals/r_workshop.md)
