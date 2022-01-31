@@ -15,7 +15,7 @@ BiocManager::install("DESeq2")
 BiocManager::install("biomaRt")
 
 # Define the base directory.
-base.dir = "/Users/mvochteloo/PycharmProjects/Teaching-modules/Practicals/differential-expression/"
+base.dir <- ""
 
 # Create the new directory
 dir.create(paste(base.dir, "RNASeqPracticalSesion", sep=""))
