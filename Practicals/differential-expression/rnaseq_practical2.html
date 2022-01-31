@@ -144,9 +144,12 @@ $(document).ready(function () {
 <div id="install-and-load-the-library-and-data" class="section level2">
 <h2>Install and load the library and data</h2>
 <pre class="r"><code># Install the library
-source(&quot;https://bioconductor.org/biocLite.R&quot;)
-biocLite(&quot;maSigPro&quot;)</code></pre>
-<pre><code>## 
+if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+
+BiocManager::install(&quot;maSigPro&quot;)
+</code></pre>
+<pre><code>##
 ## The downloaded binary packages are in
 ##  /var/folders/z8/h1y5vbt951b6symy4835srz00000gp/T//RtmpbC2MYn/downloaded_packages</code></pre>
 <pre class="r"><code>#install.packages(&quot;pheatmap&quot;)
@@ -159,7 +162,7 @@ library(&quot;MASS&quot;)</code></pre>
 # Load the accompanying data
 data(data.abiotic)
 data(edesign.abiotic)</code></pre>
-<p>For this section we will use a public data set from a plant abiotic stress study performed at the TIGR Institute by (Rensink et al., 2005). In this study, potato plants were subjected to three different types of abiotic stresses (cold, heat and salt) and gene expression was monitored at three time points after the start of the treatments. RNA was also collected from non-stressed plants at the same time points and all samples where hybridased against a common control on a 11K cDNA potato chip. There are three biological replicates for each experimental condition. The matrix ‘edesign.abiotic’ contains the description of the experimental design. The dataframe ‘data.abiotic’ contains normalized expression data for a random set of 1000 genes of this study.</p>
+<p>For this section we will use a public data set from a plant abiotic stress study performed at the TIGR Institute by (<a href="https://pubmed.ncbi.nlm.nih.gov/15856349/" class="uri">Rensink et al., 2005</a>). In this study, potato plants were subjected to three different types of abiotic stresses (cold, heat and salt) and gene expression was monitored at three time points after the start of the treatments. RNA was also collected from non-stressed plants at the same time points and all samples where hybridased against a common control on a 11K cDNA potato chip. There are three biological replicates for each experimental condition. The matrix ‘edesign.abiotic’ contains the description of the experimental design. The dataframe ‘data.abiotic’ contains normalized expression data for a random set of 1000 genes of this study.</p>
 </div>
 </div>
 <div id="building-the-regression-model" class="section level1">
@@ -182,9 +185,9 @@ data(edesign.abiotic)</code></pre>
 ## [1] &quot;fitting gene 700 out of 878&quot;
 ## [1] &quot;fitting gene 800 out of 878&quot;</code></pre>
 <p>The function ‘p.vector’ takes the previously constructed design object and the gene expression data and builds the regression models and calculates their significance. The parameter ‘Q’ represents the p-value threshold at which a model is considered to be significant. ‘MT.adjust’ specifies the method of accounting for multiple testing error (type 1 error rate), in this case the Benjamini-Hochberg method. Min.obs specifies how many samples must be present for the model to be fitted. If not enough samples are present for a gene a reliable model can not be built, so genes with many missing samples must be omitted.</p>
-<p>Q2: How many genes show significance for the specified theshold Q = 0.05?</p>
+<p>Q2: How many genes show significance for the specified threshold Q = 0.05?</p>
 <p>Q3: And for Q = 0.005?</p>
-<p>Q4: What is the effect on the overall amount of signifcant genes when no multiple testing correction is applied?</p>
+<p>Q4: What is the effect on the overall amount of significant genes when no multiple testing correction is applied?</p>
 <p>Stuck? Try reading the help using ?p.vector</p>
 </div>
 <div id="finding-differences-between-experimental-conditions" class="section level2">
@@ -194,7 +197,7 @@ data(edesign.abiotic)</code></pre>
 ## [1] &quot;fitting gene 200 out of 398&quot;
 ## [1] &quot;fitting gene 300 out of 398&quot;
 ## [1] &quot;Influence: 19 genes with influential data at slot influ.info. Model validation for these genes is recommended&quot;</code></pre>
-<p>Next selection of which variables are significant is perfomred. This is done using a process called stepwise regression. During this process variables are added to a null model (forward) or removed from the full model (backward) one by one and at each step the model quality is assesed. In this case the backward selection method is used so it starts of with a model with all variables and they are subsequently removed one by one. The parameter alfa represents the p-value threshold variables must have to be included in the model.</p>
+<p>Next selection of which variables are significant is performed. This is done using a process called stepwise regression. During this process variables are added to a null model (forward) or removed from the full model (backward) one by one and at each step the model quality is assesed. In this case the backward selection method is used so it starts of with a model with all variables and they are subsequently removed one by one. The parameter alfa represents the p-value threshold variables must have to be included in the model.</p>
 <p>Q5: What would be the effect of increasing alfa?</p>
 </div>
 <div id="getting-the-list-of-significant-genes" class="section level2">
