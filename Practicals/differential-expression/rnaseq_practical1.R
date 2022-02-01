@@ -138,6 +138,15 @@ vst_unstim <- assay(vst(dds_unstim, blind=FALSE))
 vst_cd3 <- assay(vst(dds_cd3, blind=FALSE))
 vst_pma <- assay(vst(dds_pma, blind=FALSE))
 
+# Q4: Describe in a few words what PCA does and why it is used.
+# PCA is a technique for reducing the dimensionality of such datasets, 
+# increasing interpretability but at the same time minimizing information loss.
+# It does so by creating new uncorrelated variables that successively 
+# maximize variance.
+# In research this technique is often used to determine if there are 
+# clusters of samples who behave similarly. For example, in gene expression
+# PCA you might find a PC that describes male / female differences.
+
 # To calculate the components by sample we need to transpose our matrix of normalized gene expression
 pcData <- prcomp(t(vst_unstim))
 pcVar <- summary(pcData)
@@ -196,7 +205,7 @@ pcaPlot_pma <- ggplot(pcPlotData, aes(x=PC1 , y=PC2 , color=type))+
 library(gridExtra)
 grid.arrange(pcaPlot_cd3, pcaPlot_pma, pcaPlot_unstim, nrow=1)
 
-# Q4: Compare your PCA plot with Figure 1 from the article. Speculate why it 
+# Q5: Compare your PCA plot with Figure 1 from the article. Speculate why it 
 # might look different.
 # 'We adjusted for gender, sequencing batch and age covariates in the analysis.'
 
@@ -239,7 +248,7 @@ pheatmap(sampleDistMatrix, main = "PMA stimulated samples",
          clustering_distance_cols=sampleDists,
          col=colors)
 
-# Q5: Compare the clustering of controls vs coeliac in the three conditions. 
+# Q6: Compare the clustering of controls vs coeliac in the three conditions. 
 # What do you notice?
 # In the unstimulated samples there is no clear difference between cases and 
 # controls but in the stimulated samples there is. 
@@ -290,7 +299,7 @@ res_pma <- results(dds_pma)
 de_pma <- res_unstim [which(res_pma$padj <= 0.05),]
 nrow(de_pma)
 
-# Q6: How many differentiall expressed genes did we find for CD3? And how many 
+# Q7: How many differentiall expressed genes did we find for CD3? And how many 
 # for PMA?
 # 2774 and 5696
 
@@ -374,7 +383,7 @@ pma_Volcano <- ggplot(pData, aes(x=log2FoldChange, y= -log10(padj)))+
 
 grid.arrange(unstim_Volcano, cd3_Volcano, pma_Volcano, nrow=1)
 
-# Q7: The PMA stimulated volcano plot has an enrichment of positive 
+# Q8: The PMA stimulated volcano plot has an enrichment of positive 
 # log2FoldChange genes. Are these genes higher or lower expressed in 
 # celial patients?
 
@@ -415,7 +424,7 @@ top10_Plot <- ggplot(pData, aes(x= type, y= value))+
                 theme(axis.text.x = element_text(angle=45, hjust = 1))
 print(top10_Plot)
 
-# Q8: Look op the 'PTPRK' gene and its association with coealiac disease. Has
+# Q9: Look op the 'PTPRK' gene and its association with coealiac disease. Has
 # this been reported in literature?
 # Yes, 'PTPRK showed lower expression in active CD compared with treated 
 # patients and controls'
