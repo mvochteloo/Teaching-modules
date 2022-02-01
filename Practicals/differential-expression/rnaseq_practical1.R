@@ -1,3 +1,27 @@
+# Q1: What is the transcriptome?
+# The transcriptome is the set of all RNA transcripts, including coding and 
+# non-coding, in an individual or a population of cells. 
+
+# Q2: What is the difference between CD3 and PMA stimulation?
+# Treatment of T cells with monoclonal anti-CD3 antibodies and anti-CD28 
+# antibodies provide a co-stimulatory signal that engages the αβ-T cell 
+# receptor (TCR complex) which can be used for antigen-induced activation.
+
+# PMA activates protein kinase C, while ionomycin is a calcium ionophore, 
+# and stimulation with these compounds bypasses the T cell membrane receptor 
+# complex and will lead to activation of several intracellular signaling 
+# pathways, resulting in T cell activation and production of a variety of 
+# cytokines.
+
+# T-cell activation is normally triggered by the interaction of a cell surface 
+# receptor to its specific ligand molecule. This binding event triggers the 
+# rapid hydrolysis of inositol phospholipids to diacylglycerol and inositol
+# phosphates by phospholipase C (PLC). Diacylglycerol is an allosteric 
+# activator of protein kinase C (PKC) activation and inositol phosphates, 
+# which trigger Ca++ release and mobilization, resulting in a cascade of 
+# additional cellular responses mediating T-cell activation.
+# https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/documents/311/794/p1585dat.pdf
+
 ## Install packages from CRAN
 install.packages("ggsci")
 install.packages("ggplot2")
@@ -15,7 +39,7 @@ BiocManager::install("DESeq2")
 BiocManager::install("biomaRt")
 
 # Define the base directory.
-base.dir <- ""
+base.dir <- "/Users/mvochteloo/PycharmProjects/Teaching-modules/Practicals/differential-expression/"
 
 # Create the new directory
 dir.create(paste(base.dir, "RNASeqPracticalSesion", sep=""))
@@ -82,6 +106,14 @@ cd3_colData <- colData[cd3_sampleNames,] #colData has sample names by row
 pma_sampleNames <- rownames(colData)[which(colData$stimulation == "PMA")]
 pma_countTable <- countTable[,pma_sampleNames]
 pma_colData <- colData[pma_sampleNames,] #colData has sample names by row
+
+# Q3: What is the difference between rlog and VST normalization?
+# rlog: https://rdrr.io/bioc/DESeq2/man/rlog.html
+# vst: https://rdrr.io/bioc/DESeq2/man/varianceStabilizingTransformation.html
+# VST runs faster than rlog. If the library size of the samples and therefore 
+# their size factors vary widely, the rlog transformation is a better option 
+# than VST. Both options produce log2 scale data which has been normalized by 
+# the DESeq2 method with respect to library size.
 
 # Load packages
 library(DESeq2)
@@ -162,7 +194,11 @@ pcaPlot_pma <- ggplot(pcPlotData, aes(x=PC1 , y=PC2 , color=type))+
                   guides(col = guide_legend(ncol = 8))
 
 library(gridExtra)
-grid.arrange(pcaPlot_unstim, pcaPlot_cd3, pcaPlot_pma, nrow=1)
+grid.arrange(pcaPlot_cd3, pcaPlot_pma, pcaPlot_unstim, nrow=1)
+
+# Q4: Compare your PCA plot with Figure 1 from the article. Speculate why it 
+# might look different.
+# 'We adjusted for gender, sequencing batch and age covariates in the analysis.'
 
 library(RColorBrewer)
 library(pheatmap)
@@ -202,6 +238,15 @@ pheatmap(sampleDistMatrix, main = "PMA stimulated samples",
          clustering_distance_rows=sampleDists,
          clustering_distance_cols=sampleDists,
          col=colors)
+
+# Q5: Compare the clustering of controls vs coeliac in the three conditions. 
+# What do you notice?
+# In the unstimulated samples there is no clear difference between cases and 
+# controls but in the stimulated samples there is. 
+# 'Thus, the transcriptome of peripheral T cells from the majority of patients 
+# is considerably different from that of controls under the conditions employed 
+# here, implying that these differences are ultimately genetically determined 
+# and relevant in disease pathogenesis.'
 
 # Load
 library(DESeq2)
@@ -244,6 +289,10 @@ dds_pma <- DESeq(dds_pma)
 res_pma <- results(dds_pma)
 de_pma <- res_unstim [which(res_pma$padj <= 0.05),]
 nrow(de_pma)
+
+# Q6: How many differentiall expressed genes did we find for CD3? And how many 
+# for PMA?
+# 2774 and 5696
 
 library(VennDiagram)
 
@@ -325,6 +374,15 @@ pma_Volcano <- ggplot(pData, aes(x=log2FoldChange, y= -log10(padj)))+
 
 grid.arrange(unstim_Volcano, cd3_Volcano, pma_Volcano, nrow=1)
 
+# Q7: The PMA stimulated volcano plot has an enrichment of positive 
+# log2FoldChange genes. Are these genes higher or lower expressed in 
+# celial patients?
+
+# log2 fold change (log2(mean expression condition 1 / mean expression condition 2)).
+# condition 1 = Coeliac
+# condition 2 = Control
+# So coeliac has higher expression than control
+
 library(pheatmap)
 
 vst_unstim <- assay(vst(dds_unstim))
@@ -356,6 +414,12 @@ top10_Plot <- ggplot(pData, aes(x= type, y= value))+
                 theme_bw()+
                 theme(axis.text.x = element_text(angle=45, hjust = 1))
 print(top10_Plot)
+
+# Q8: Look op the 'PTPRK' gene and its association with coealiac disease. Has
+# this been reported in literature?
+# Yes, 'PTPRK showed lower expression in active CD compared with treated 
+# patients and controls'
+# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3925264/
 
 top10Genes <- rownames(de_cd3)[order(de_cd3$padj)[1:10]]
 # Using melt to literaly melt a wide data.frame into a long data.frame
