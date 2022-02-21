@@ -3,7 +3,7 @@
 """
 File:         assign_projects.py
 Created:      2021/02/02
-Last Changed:
+Last Changed: 2022/02/21
 Author:       M.Vochteloo
 
 Copyright (C) 2020 M.Vochteloo
@@ -28,14 +28,8 @@ import argparse
 import itertools
 import os
 import math
-import multiprocessing as mp
-import queue
-import random
-import time
-from datetime import datetime
 
 # Third party imports.
-import numpy as np
 import pandas as pd
 import seaborn as sns
 from scipy import optimize
@@ -65,28 +59,12 @@ class main():
         self.sheet_name = getattr(arguments, 'sheet')
         self.min_group_size = getattr(arguments, 'min_group_size')
         self.max_group_size = getattr(arguments, 'max_group_size')
-        cores = getattr(arguments, 'cores')
-        if cores is None:
-            cores = mp.cpu_count()
-        self.cores = cores
-        self.max_end_time = int(time.time()) + self.time_to_sec(getattr(arguments, 'time'))
 
         if not os.path.exists(self.data_path):
             print("Input file does not exist.")
             exit()
         if not self.data_path.endswith(".xlsx"):
             print("Input file should be an excel sheet.")
-            exit()
-
-    def time_to_sec(self, time):
-        if time == "SHORT":
-            return 21300
-        elif time == "MEDIUM":
-            return 86100
-        elif time == "LONG":
-            return 604500
-        else:
-            print("Unexpected input for -t / --time.")
             exit()
 
     @staticmethod
@@ -127,20 +105,6 @@ class main():
                             default=4,
                             help="The maximal number of student in a"
                                  "group. Default: 4.")
-        parser.add_argument("-c",
-                            "--cores",
-                            type=int,
-                            required=False,
-                            default=None,
-                            help="The number of cores to use. Default: max.")
-        parser.add_argument("-t",
-                            "--time",
-                            type=str,
-                            required=False,
-                            choices=["SHORT", "MEDIUM", "LONG"],
-                            default="SHORT",
-                            help="The maximal time for the program to run. "
-                                 "Default: 6 hours.")
 
         return parser.parse_args()
 
@@ -149,51 +113,42 @@ class main():
 
         print("### Step1 ###")
         print("Loading data")
-        # df = self.load_file(self.data_path, header=0, sheet_name=self.sheet_name)
-
-        n_students = 28
-        n_projects = 9
-        m = np.empty((n_students, n_projects), dtype=np.int)
-        options = np.arange(1, n_projects + 1, 1)
-        for i in range(n_students):
-            preference = options.copy()
-            np.random.shuffle(preference)
-            m[i, :] = preference
-        df = pd.DataFrame(m,
-                          columns=["project {}".format(i + 1) for i in
-                                   range(n_projects)]
-                          )
-        df.insert(0, "Student", ["student {}".format(i + 1) for i in range(n_students)])
-        print(df)
+        preference_df = self.load_file(self.data_path,
+                                       header=0,
+                                       index_col=0,
+                                       sheet_name=self.sheet_name)
 
         print("")
         print("### Step2 ###")
         print("Validate data")
-        self.validate(df)
+        self.validate(preference_df)
 
         print("")
         print("### Step3 ###")
         print("Pre-process the data")
-        df.set_index("Student", inplace=True)
-        df.index.name = None
-        print(df)
+        preference_df = preference_df.astype(int)
+        print(preference_df)
 
         print("")
         print("### Step4 ###")
         print("Calculate information")
-        students = list(df.index)
+        students = list(preference_df.index)
         print("\tNumber of students: {}".format(len(students)))
-        projects = list(df.columns)
+        projects = list(preference_df.columns)
         print("\tNumber of projects: {}".format(len(projects)))
-        identical = self.find_identical_answers(df)
+        identical = self.find_identical_answers(preference_df)
         print("\tStudents with identical answers:")
         if len(identical) > 0:
             for identical_answer_group in identical:
                 print("\t\t{}".format(', '.join(identical_answer_group)))
         else:
             print("\t\tNone")
-        # self.print_preferences(df)
-        self.plot_preferences(df)
+        avg_preference_df = preference_df.mean(axis=0)
+        avg_preference_df.sort_values(inplace=True)
+        print("Average score:")
+        for project_id, mean_score in avg_preference_df.iteritems():
+            print("\t{}: {:.1f}".format(project_id, mean_score))
+        self.plot_preferences(preference_df)
 
         print("")
         print("### Step5 ###")
@@ -209,12 +164,13 @@ class main():
         print("")
         print("### Step6 ###")
         print("Solve fast")
-        solutions = self.solve(df, possible_groups_sizes)
+        solutions = self.solve(preference_df, possible_groups_sizes)
         for i, (sum_score, groups) in enumerate(solutions):
             print("Solution {}:".format(i + 1))
 
-            choice_counts = {}
+            total_choice_counts = {}
             for project, students in groups.items():
+                choice_counts = {}
                 students_str = []
                 for name, score in students:
                     students_str.append("{} [{}]".format(name, score))
@@ -222,14 +178,26 @@ class main():
                         choice_counts[score] = choice_counts[score] + 1
                     else:
                         choice_counts[score] = 1
-                print("\t  {}: {}".format(project, ", ".join(students_str)))
+
+                if len(students_str) > 0:
+                    choice_info = []
+                    for j in range(1, 100):
+                        if j in choice_counts:
+                            choice_info.append("{}x{}".format(j, choice_counts[j]))
+                    print("\t  {}: {}, ({})".format(project, ", ".join(students_str), ", ".join(choice_info)))
+                else:
+                    print("\t  {}".format(project))
+
+                for choice, count in choice_counts.items():
+                    if choice in total_choice_counts:
+                        total_choice_counts[choice] += count
+                    else:
+                        total_choice_counts[choice] = count
 
             choice_info = []
             for j in range(1, 100):
-                if j in choice_counts:
-                    choice_info.append("{}x{}".format(j, choice_counts[j]))
-                else:
-                    break
+                if j in total_choice_counts:
+                    choice_info.append("{}x{}".format(j, total_choice_counts[j]))
 
             print("\t  Preference score: {}\t\tChoice counts: {}".format(sum_score, ", ".join(choice_info)))
 
@@ -241,22 +209,28 @@ class main():
 
     @staticmethod
     def validate(df):
-        if df.columns[0] != "Student":
-            print("\tThe first column should be named 'Student' and contain the tudent name.")
-            exit()
-        if len(df.iloc[:, 0].unique()) != df.shape[0]:
+        if len(df.index.unique()) != df.shape[0]:
             print("\tThe 'Student' column cannot duplicate values.")
             exit()
 
-        for i, (_, row) in enumerate(df.iterrows()):
-            counts = row[1:].value_counts()
-            counts.sort_index(inplace=True)
+        for i, (student_id, student_preferences) in enumerate(df.iterrows()):
+            preferences_counts = student_preferences.value_counts()
+            preferences_counts.sort_index(inplace=True)
             prev_rank = 1
-            for rank, count in counts.iteritems():
+            for rank, count in preferences_counts.iteritems():
                 if rank > (prev_rank + 1):
-                    print("\t[{}] {} does not have a valid top preference".format(i, row["Student"]))
+                    print("\t[{}] {} does not have a valid top preference".format(i, student_id))
                     exit()
                 prev_rank = rank
+
+            # student_preferences = list(zip(student_preferences.index, student_preferences.values))
+            # student_preferences.sort(key=lambda x: x[1])
+            #
+            # if student_id == ":
+            #     print(student_id)
+            #     for project, score in student_preferences:
+            #         print("{}. [{}] ...".format(score, project))
+            #     print("")
 
     @staticmethod
     def find_identical_answers(df):
@@ -276,15 +250,6 @@ class main():
             if len(item) > 1:
                 students_with_identical_answers.append(item)
         return students_with_identical_answers
-
-    @staticmethod
-    def print_preferences(df):
-        tmp = df.copy()
-        for index, row in tmp.iterrows():
-            print(index)
-            row.sort_values(inplace=True)
-            print(row)
-            print("")
 
     @staticmethod
     def plot_preferences(df):
@@ -393,155 +358,7 @@ class main():
         print("  > Sheet name: {}".format(self.sheet_name))
         print("  > Min group size: {}".format(self.min_group_size))
         print("  > Max group size: {}".format(self.max_group_size))
-        print("  > Cores: {}".format(self.cores))
-        print("  > Max. end time: {}".format(datetime.fromtimestamp(self.max_end_time).strftime("%Y-%m-%d %H:%M:%S")))
         print("")
-
-
-class MultiProcessor:
-    def __init__(self, cores, max_end_time, data):
-        self.cores = cores
-        self.max_end_time = max_end_time
-        self.data = data
-
-    def process(self, work_func, iterable):
-        cores = self.cores
-        if cores > len(iterable):
-            cores = len(iterable)
-
-        if cores == 1:
-            result = self.singe_process(work_func=work_func,
-                                        iterable=iterable)
-        else:
-            result = self.multiprocessing(work_func=work_func,
-                                          iterable=iterable,
-                                          cores=cores)
-
-        return result
-
-    def singe_process(self, work_func, iterable):
-        print("\t\tProcessing {} instances with 1 core.".format(len(iterable)))
-
-        result = []
-        best_preference_score = np.inf
-        start_time = int(time.time())
-        last_print_time = int(time.time())
-        for i, instance in enumerate(iterable):
-            if self.max_end_time <= time.time():
-                break
-
-            output = work_func(instance, self.data.copy())
-            if isinstance(output, list):
-                for out in output:
-                    if out[1] <= (best_preference_score + 1):
-                        best_preference_score = out[1]
-                        result.append(out)
-            else:
-                if output[1] <= (best_preference_score + 1):
-                    best_preference_score = output[1]
-                    result.append(output)
-
-            now_time = int(time.time())
-            if now_time - last_print_time >= 60:
-                last_print_time = now_time
-                rt_min, rt_sec = divmod(time.time() - start_time, 60)
-                rt_hour, rt_min = divmod(rt_min, 60)
-                print("\t\t\t[{:02d}:{:02d}:{:02d}] {}/{} instances completed [{:.2f}%]".format(int(rt_hour), int(rt_min), int(rt_sec), i+1, len(iterable), (100 / len(iterable)) * (i+1)))
-
-        return result
-
-    def multiprocessing(self, work_func, iterable, cores):
-        # Create queues.
-        in_manager = mp.Manager()
-        input_q = in_manager.Queue(maxsize=len(iterable))
-        out_manager = mp.Manager()
-        output_q = out_manager.Queue(maxsize=len(iterable))
-
-        # Populate queues.
-        for instance in iterable:
-            input_q.put(instance)
-
-        # Create workers.
-        processes = []
-        for proc_id in range(cores):
-            processes.append(mp.Process(target=self.worker,
-                                        args=(input_q, output_q, work_func,
-                                              self.data.copy(),
-                                              self.max_end_time)
-                                        ))
-
-        # Start workers.
-        started_procs = []
-        for proc in processes:
-            try:
-                proc.start()
-                started_procs.append(proc)
-            except RuntimeError:
-                pass
-        del processes
-
-        # Log the progress
-        print("\t\tProcessing {} instances with {} cores.".format(len(iterable), cores))
-        n = 0
-        start_time = int(time.time())
-        last_print_time = int(time.time())
-        while n < len(iterable):
-            time.sleep(2)
-            n = output_q.qsize()
-            if self.max_end_time <= time.time():
-                print("\t\t\tmax progress time reached")
-                break
-
-            now_time = int(time.time())
-            if now_time - last_print_time >= 60:
-                last_print_time = now_time
-                rt_min, rt_sec = divmod(time.time() - start_time, 60)
-                rt_hour, rt_min = divmod(rt_min, 60)
-                print("\t\t\t[{:02d}:{:02d}:{:02d}] {}/{} instances completed [{:.2f}%]".format(int(rt_hour), int(rt_min), int(rt_sec), n, len(iterable), (100 / len(iterable)) * n))
-
-        # Stop the cores.
-        for _ in range(cores):
-            input_q.put("DONE")
-
-        # Join the workers.
-        for proc in started_procs:
-            proc.join()
-
-        # Join the results.
-        result = []
-        best_preference_score = np.inf
-        while output_q.qsize() > 0:
-            (instance, output) = output_q.get(True, timeout=1)
-            if isinstance(output, list):
-                for out in output:
-                    if out[1] <= (best_preference_score + 1):
-                        best_preference_score = out[1]
-                        result.append(out)
-            else:
-                if output[1] <= (best_preference_score + 1):
-                    best_preference_score = output[1]
-                    result.append(output)
-
-        del in_manager, input_q, out_manager, output_q
-
-        return result
-
-    @staticmethod
-    def worker(input_queue, output_queue, work_func, data, max_end_time):
-        while True:
-            if max_end_time <= time.time():
-                break
-            try:
-                if not input_queue.empty():
-                    instance = input_queue.get(True, timeout=1)
-                    if instance == "DONE":
-                        break
-
-                    output_queue.put((instance, work_func(instance, data)))
-            except queue.Empty:
-                pass
-
-            time.sleep(random.uniform(0.5, 1))
 
 
 if __name__ == '__main__':
